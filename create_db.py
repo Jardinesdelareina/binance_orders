@@ -37,4 +37,10 @@ def create_db(ticker):
     print(f'create table {title_table}')
 
 
-create_db('BTCUSDT')
+table_names = [
+    'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'DOTUSDT', 
+    'LINKUSDT', 'MATICUSDT', 'AVAXUSDT', 'ZILUSDT', 'VETUSDT'
+]
+
+for name in table_names:
+    create_db(name)

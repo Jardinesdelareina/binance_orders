@@ -51,6 +51,3 @@ SELECT commission_asset FROM btcusdt INTERSECT SELECT commission_asset FROM xrpu
 
 -- вывести commission_asset, которых нет в таблицах btcusdt и xrpusdt
 SELECT commission_asset FROM btcusdt EXCEPT SELECT commission_asset FROM xrpusdt;
-
--- соединить две таблицы по колонке id, данные которой одинаковы для обеих таблиц
-SELECT order_id, price, commission FROM linkusdt INNER JOIN bnbusdt ON linkusdt.id = bnbusdt.id;
