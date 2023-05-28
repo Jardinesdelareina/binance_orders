@@ -16,22 +16,23 @@ CLIENT = Client(env('API_KEY'), env('SECRET_KEY'), {'verify': True, 'timeout': 2
 
 
 def create_db(ticker):
-    df = pd.DataFrame(CLIENT.get_my_trades(symbol=ticker, limit=1000))
+    df = pd.DataFrame(CLIENT.get_all_orders(symbol=ticker, limit=1000))
+    df.drop([
+        'clientOrderId', 'orderListId', 'timeInForce', 'icebergQty', 'selfTradePreventionMode',
+        'origQuoteOrderQty', 'isWorking', 'stopPrice', 'origQty', 'updateTime', 'workingTime',
+        ], axis=1, inplace=True
+    )
     df = df.rename(columns={
         'orderId': 'order_id',
-        'quoteQty': 'quote_qty',
-        'commissionAsset': 'commission_asset',
-        'isBuyer': 'is_buyer',
-        'isMaker': 'is_maker'
+        'executedQty': 'execute_qty',
+        'updateTime': 'update_time',
+        'workingTime': 'working_time',
+        'cummulativeQuoteQty': 'cum_qty'
     })
-    df.price = df.price.astype(float)
-    df.qty = df.qty.astype(float)
-    df.quote_qty = round((df.quote_qty.astype(float)), 4)
-    df.commission = round((df.commission.astype(float)), 4)
     df.time = pd.Series(pd.to_datetime(df.time, unit='ms', utc=True)).dt.strftime('%Y-%m-%d %H:%M:%S')
-    df.drop('orderListId', axis=1, inplace=True)
-    df.drop('id', axis=1, inplace=True)
-    df.drop('isBestMatch', axis=1, inplace=True)
+    df.price = round(df.price.astype(float), 4)
+    df.execute_qty = round(df.execute_qty.astype(float), 6 if ticker == 'BTCUSDT' else 4)
+    df.cum_qty = round(df.cum_qty.astype(float), 2)
     title_table = ticker.lower()
     df.to_sql(name=title_table, con=ENGINE, if_exists='replace', index=False)
     print(f'create table {title_table}')
